@@ -1,0 +1,17 @@
+language: php
+
+php:
+  - 7.1
+
+services:
+  - postgresql
+
+addons:
+  postgresql: "9.5.5"
+
+before_script:
+  - psql -c 'create database travis_ci_test;' -U postgres
+  - composer self-update
+  - composer install -d server --prefer-source --no-interaction --dev
+
+script: phpunit --configuration server/phpunit.xml

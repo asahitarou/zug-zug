@@ -1,0 +1,9 @@
+node_modules
+/server/public/storage
+/server/storage/*.key
+/server/vendor
+/.idea
+.env
+_ide_helper*
+.phpstorm.meta.php
+/server/public/images/uploads

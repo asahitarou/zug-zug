@@ -1,0 +1,65 @@
+version: '2'
+
+services:
+    php:
+        build:
+            context: ./docker/php
+        command: "/start.sh && php-fpm"
+        volumes:
+            - "./server/:/var/www/zug-zug.ru"
+        expose:
+            - "9000"
+        links:
+            - postgres
+            - redis
+        environment:
+            - PHP_IDE_CONFIG="serverName=laravel"
+        tty: true
+
+#    node:
+#        build:
+#            context: ./docker/node
+#        volumes:
+#            - "./:/var/www"
+
+    nginx:
+        build:
+            context: ./docker/nginx
+            args:
+                - PHP_UPSTREAM=php
+        volumes_from:
+            - php
+        volumes:
+            - ./docker/nginx/sites-available/:/etc/nginx/sites-available
+        ports:
+            - "80:80"
+            - "443:443"
+        links:
+            - php
+
+    postgres:
+        build:
+            context: ./docker/postgres
+        volumes:
+            - postgres:/var/lib/postgresql/data
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_DB: laravel
+            POSTGRES_USER: root
+            POSTGRES_PASSWORD: root
+
+    redis:
+        build: ./docker/redis
+        volumes:
+            - redis:/data
+        ports:
+            - "6379:6379"
+
+volumes:
+    postgres:
+        driver: "local"
+    redis:
+        driver: "local"
+    sessions:    ## nothing is connected to this (- ./data/sessions:/sessions)
+        driver: "local"
